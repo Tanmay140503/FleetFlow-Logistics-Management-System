@@ -1,1 +1,86 @@
+@model FleetFlow.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register New User";
+}
 
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus"></i> Register New User
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label">
+                            <i class="bi bi-person"></i> Full Name <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">
+                            <i class="bi bi-envelope"></i> Email Address <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="user@fleetflow.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label">
+                            <i class="bi bi-shield-check"></i> User Role <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="Role" class="form-select" asp-items="Html.GetEnumSelectList<FleetFlow.Models.UserRole>()">
+                            <option value="">-- Select Role --</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger small"></span>
+                        <small class="text-muted">
+                            <ul class="mt-2 small">
+                                <li><strong>Fleet Manager:</strong> Full system access</li>
+                                <li><strong>Dispatcher:</strong> Trips and assignments</li>
+                                <li><strong>Safety Officer:</strong> Driver compliance</li>
+                                <li><strong>Financial Analyst:</strong> Reports only</li>
+                            </ul>
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">
+                            <i class="bi bi-lock"></i> Password <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Password" class="form-control" placeholder="Minimum 6 characters" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label">
+                            <i class="bi bi-lock-fill"></i> Confirm Password <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="UserManagement" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Register User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
