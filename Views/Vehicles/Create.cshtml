@@ -1,1 +1,103 @@
+@model FleetFlow.Models.Vehicle
+@{
+    ViewData["Title"] = "Add New Vehicle";
+}
 
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Add New Vehicle
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Vehicle Name -->
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label">
+                                <i class="bi bi-car-front"></i> Vehicle Name/Model <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="e.g., Toyota Hiace 2023" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- License Plate -->
+                        <div class="col-md-6">
+                            <label asp-for="LicensePlate" class="form-label">
+                                <i class="bi bi-card-text"></i> License Plate <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="LicensePlate" class="form-control" placeholder="e.g., ABC-1234" style="text-transform: uppercase;" />
+                            <span asp-validation-for="LicensePlate" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Vehicle Type -->
+                        <div class="col-md-4">
+                            <label asp-for="Type" class="form-label">
+                                <i class="bi bi-tags"></i> Vehicle Type <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<FleetFlow.Models.VehicleType>()">
+                                <option value="">-- Select Type --</option>
+                            </select>
+                            <span asp-validation-for="Type" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Max Load Capacity -->
+                        <div class="col-md-4">
+                            <label asp-for="MaxLoadCapacity" class="form-label">
+                                <i class="bi bi-box"></i> Max Load Capacity (kg) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="MaxLoadCapacity" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="MaxLoadCapacity" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Current Odometer -->
+                        <div class="col-md-4">
+                            <label asp-for="CurrentOdometer" class="form-label">
+                                <i class="bi bi-speedometer"></i> Current Odometer (km) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="CurrentOdometer" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="CurrentOdometer" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Region -->
+                        <div class="col-md-6">
+                            <label asp-for="Region" class="form-label">
+                                <i class="bi bi-geo"></i> Region
+                            </label>
+                            <input asp-for="Region" class="form-control" placeholder="e.g., North, South, East, West" />
+                            <span asp-validation-for="Region" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Acquisition Cost -->
+                        <div class="col-md-6">
+                            <label asp-for="AcquisitionCost" class="form-label">
+                                <i class="bi bi-currency-rupee"></i> Acquisition Cost
+                            </label>
+                            <input asp-for="AcquisitionCost" type="number" class="form-control" step="0.01" min="0" placeholder="Purchase price" />
+                            <span asp-validation-for="AcquisitionCost" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Add Vehicle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
