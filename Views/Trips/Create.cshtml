@@ -1,1 +1,155 @@
+@model FleetFlow.Models.Trip
+@{
+    ViewData["Title"] = "Create New Trip";
+}
 
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Create New Trip
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Vehicle Selection -->
+                        <div class="col-md-6">
+                            <label asp-for="VehicleId" class="form-label">
+                                <i class="bi bi-truck"></i> Select Vehicle <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="VehicleId" class="form-select" asp-items="ViewBag.VehicleId" id="vehicleSelect">
+                                <option value="">-- Select Available Vehicle --</option>
+                            </select>
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
+                            <div id="vehicleInfo" class="mt-2 alert alert-info d-none">
+                                <small><strong>Max Capacity:</strong> <span id="vehicleCapacity">0</span> kg</small>
+                            </div>
+                        </div>
+
+                        <!-- Driver Selection -->
+                        <div class="col-md-6">
+                            <label asp-for="DriverId" class="form-label">
+                                <i class="bi bi-person"></i> Select Driver <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="DriverId" class="form-select" asp-items="ViewBag.DriverId">
+                                <option value="">-- Select Available Driver --</option>
+                            </select>
+                            <span asp-validation-for="DriverId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Origin Address -->
+                        <div class="col-md-6">
+                            <label asp-for="OriginAddress" class="form-label">
+                                <i class="bi bi-geo-alt text-success"></i> Origin Address <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="OriginAddress" class="form-control" placeholder="Pickup location" />
+                            <span asp-validation-for="OriginAddress" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Destination Address -->
+                        <div class="col-md-6">
+                            <label asp-for="DestinationAddress" class="form-label">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> Destination Address <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="DestinationAddress" class="form-control" placeholder="Delivery location" />
+                            <span asp-validation-for="DestinationAddress" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Cargo Weight -->
+                        <div class="col-md-4">
+                            <label asp-for="CargoWeight" class="form-label">
+                                <i class="bi bi-box"></i> Cargo Weight (kg) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="CargoWeight" type="number" class="form-control" step="0.01" min="0" id="cargoWeight" />
+                            <span asp-validation-for="CargoWeight" class="text-danger small"></span>
+                            <div id="weightWarning" class="text-danger small d-none mt-1">
+                                <i class="bi bi-exclamation-triangle"></i> Weight exceeds vehicle capacity!
+                            </div>
+                        </div>
+
+                        <!-- Cargo Description -->
+                        <div class="col-md-4">
+                            <label asp-for="CargoDescription" class="form-label">
+                                <i class="bi bi-card-text"></i> Cargo Description
+                            </label>
+                            <input asp-for="CargoDescription" class="form-control" placeholder="What's being transported?" />
+                        </div>
+
+                        <!-- Revenue -->
+                        <div class="col-md-4">
+                            <label asp-for="Revenue" class="form-label">
+                                <i class="bi bi-currency-rupee"></i> Expected Revenue
+                            </label>
+                            <input asp-for="Revenue" type="number" class="form-control" step="0.01" min="0" placeholder="0.00" />
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Info Box -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Trip Creation Rules</h6>
+                        <ul class="mb-0 small">
+                            <li>Trip will be created in <strong>Draft</strong> status</li>
+                            <li>Cargo weight cannot exceed vehicle's max load capacity</li>
+                            <li>Driver's license must be valid and match vehicle type</li>
+                            <li>You can dispatch the trip after review</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Create Trip
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            var maxCapacity = 0;
+
+            $('#vehicleSelect').change(function() {
+                var vehicleId = $(this).val();
+                if (vehicleId) {
+                    $.get('@Url.Action("GetVehicleCapacity", "Trips")', { vehicleId: vehicleId }, function(data) {
+                        maxCapacity = data.capacity;
+                        $('#vehicleCapacity').text(data.capacity);
+                        $('#vehicleInfo').removeClass('d-none');
+                        checkWeight();
+                    });
+                } else {
+                    $('#vehicleInfo').addClass('d-none');
+                    maxCapacity = 0;
+                }
+            });
+
+            $('#cargoWeight').on('input', function() {
+                checkWeight();
+            });
+
+            function checkWeight() {
+                var weight = parseFloat($('#cargoWeight').val()) || 0;
+                if (maxCapacity > 0 && weight > maxCapacity) {
+                    $('#weightWarning').removeClass('d-none');
+                    $('#cargoWeight').addClass('is-invalid');
+                } else {
+                    $('#weightWarning').addClass('d-none');
+                    $('#cargoWeight').removeClass('is-invalid');
+                }
+            }
+        });
+    </script>
+}
