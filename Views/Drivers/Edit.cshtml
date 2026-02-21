@@ -1,1 +1,129 @@
+@model FleetFlow.Models.Driver
+@{
+    ViewData["Title"] = "Edit Driver";
+}
 
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil"></i> Edit Driver: @Model.Name
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="TotalTripsCompleted" />
+                    <input type="hidden" asp-for="HireDate" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label">Full Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                        </div>
+
+                        <!-- License Number -->
+                        <div class="col-md-6">
+                            <label asp-for="LicenseNumber" class="form-label">License Number</label>
+                            <input asp-for="LicenseNumber" class="form-control bg-light" readonly />
+                            <small class="text-muted">License number cannot be changed</small>
+                        </div>
+
+                        <!-- License Expiry -->
+                        <div class="col-md-6">
+                            <label asp-for="LicenseExpiry" class="form-label">License Expiry Date</label>
+                            <input asp-for="LicenseExpiry" type="date" class="form-control" />
+                            <span asp-validation-for="LicenseExpiry" class="text-danger small"></span>
+                        </div>
+
+                        <!-- License Category -->
+                        <div class="col-md-6">
+                            <label asp-for="LicenseCategory" class="form-label">License Category</label>
+                            <select asp-for="LicenseCategory" class="form-select">
+                                <option value="Bike">Bike Only</option>
+                                <option value="Van">Van Only</option>
+                                <option value="Truck">Truck Only</option>
+                                <option value="Van, Truck">Van & Truck</option>
+                                <option value="Bike, Van">Bike & Van</option>
+                                <option value="Bike, Van, Truck">All Categories</option>
+                            </select>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label">Status</label>
+                            <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<FleetFlow.Models.DriverStatus>()"></select>
+                        </div>
+
+                        <!-- Safety Score -->
+                        <div class="col-md-6">
+                            <label asp-for="SafetyScore" class="form-label">Safety Score (0-100)</label>
+                            <input asp-for="SafetyScore" type="number" class="form-control" min="0" max="100" step="0.01" />
+                            <span asp-validation-for="SafetyScore" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Stats Display -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Total Trips</h6>
+                                    <h4>@Model.TotalTripsCompleted</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Hire Date</h6>
+                                    <h4>@Model.HireDate.ToString("dd MMM yyyy")</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Experience</h6>
+                                    <h4>@((DateTime.Now - Model.HireDate).Days / 30) months</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning px-4">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
