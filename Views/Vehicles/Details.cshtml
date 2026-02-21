@@ -1,1 +1,273 @@
+@model FleetFlow.Models.Vehicle
+@{
+    ViewData["Title"] = "Vehicle Details";
+}
 
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Vehicles</a></li>
+        <li class="breadcrumb-item active">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- Vehicle Info Card -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Vehicle Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    @switch (Model.Type)
+                    {
+                        case FleetFlow.Models.VehicleType.Truck:
+                            <i class="bi bi-truck text-primary" style="font-size: 4rem;"></i>
+                            break;
+                        case FleetFlow.Models.VehicleType.Van:
+                            <i class="bi bi-bus-front text-info" style="font-size: 4rem;"></i>
+                            break;
+                        case FleetFlow.Models.VehicleType.Bike:
+                            <i class="bi bi-bicycle text-success" style="font-size: 4rem;"></i>
+                            break;
+                    }
+                    <h4 class="mt-2 mb-1">@Model.Name</h4>
+                    <code class="bg-light px-2 py-1 rounded">@Model.LicensePlate</code>
+                </div>
+
+                <hr>
+
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted">Type</td>
+                        <td class="text-end"><strong>@Model.Type</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Max Capacity</td>
+                        <td class="text-end"><strong>@Model.MaxLoadCapacity.ToString("N0") kg</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Odometer</td>
+                        <td class="text-end"><strong>@Model.CurrentOdometer.ToString("N0") km</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Region</td>
+                        <td class="text-end"><strong>@(Model.Region ?? "N/A")</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Status</td>
+                        <td class="text-end">
+                            @switch (Model.Status)
+                            {
+                                case FleetFlow.Models.VehicleStatus.Available:
+                                    <span class="badge bg-success">Available</span>
+                                    break;
+                                case FleetFlow.Models.VehicleStatus.OnTrip:
+                                    <span class="badge bg-primary">On Trip</span>
+                                    break;
+                                case FleetFlow.Models.VehicleStatus.InShop:
+                                    <span class="badge bg-warning text-dark">In Shop</span>
+                                    break;
+                                case FleetFlow.Models.VehicleStatus.OutOfService:
+                                    <span class="badge bg-danger">Out of Service</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Acquisition Cost</td>
+                        <td class="text-end"><strong>@(Model.AcquisitionCost.HasValue ? "$" + Model.AcquisitionCost.Value.ToString("N2") : "N/A")</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Added On</td>
+                        <td class="text-end"><strong>@Model.CreatedAt.ToString("dd MMM yyyy")</strong></td>
+                    </tr>
+                </table>
+
+                <hr>
+
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Edit Vehicle
+                    </a>
+                    <a asp-controller="Maintenance" asp-action="Create" asp-route-vehicleId="@Model.Id" class="btn btn-outline-primary">
+                        <i class="bi bi-tools"></i> Add Maintenance
+                    </a>
+                    <a asp-controller="FuelLogs" asp-action="Create" asp-route-vehicleId="@Model.Id" class="btn btn-outline-info">
+                        <i class="bi bi-fuel-pump"></i> Add Fuel Log
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column - History -->
+    <div class="col-lg-8">
+        <!-- Trips History -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Recent Trips</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Trips != null && Model.Trips.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Trip Code</th>
+                                    <th>Driver</th>
+                                    <th>Route</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var trip in Model.Trips.Take(10))
+                                {
+                                    <tr>
+                                        <td><code>@trip.TripCode</code></td>
+                                        <td>@trip.Driver?.Name</td>
+                                        <td>
+                                            <small>
+                                                @trip.OriginAddress<br>
+                                                <i class="bi bi-arrow-down text-muted"></i><br>
+                                                @trip.DestinationAddress
+                                            </small>
+                                        </td>
+                                        <td>@trip.CreatedAt.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            @switch (trip.Status)
+                                            {
+                                                case FleetFlow.Models.TripStatus.Draft:
+                                                    <span class="badge bg-secondary">Draft</span>
+                                                    break;
+                                                case FleetFlow.Models.TripStatus.Dispatched:
+                                                    <span class="badge bg-primary">Dispatched</span>
+                                                    break;
+                                                case FleetFlow.Models.TripStatus.Completed:
+                                                    <span class="badge bg-success">Completed</span>
+                                                    break;
+                                                case FleetFlow.Models.TripStatus.Cancelled:
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                    break;
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-geo-alt" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No trips recorded yet</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Maintenance History -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-tools"></i> Maintenance History</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.MaintenanceLogs != null && Model.MaintenanceLogs.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Service Type</th>
+                                    <th>Date</th>
+                                    <th>Cost</th>
+                                    <th>Performed By</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model.MaintenanceLogs.Take(10))
+                                {
+                                    <tr>
+                                        <td><strong>@log.ServiceType</strong></td>
+                                        <td>@log.ServiceDate.ToString("dd MMM yyyy")</td>
+                                        <td>$@log.Cost.ToString("N2")</td>
+                                        <td>@log.PerformedBy</td>
+                                        <td>
+                                            @if (log.IsCompleted)
+                                            {
+                                                <span class="badge bg-success">Completed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">In Progress</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-tools" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No maintenance records</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Fuel History -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-fuel-pump"></i> Fuel History</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.FuelLogs != null && Model.FuelLogs.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Liters</th>
+                                    <th>Cost</th>
+                                    <th>Price/L</th>
+                                    <th>Station</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var fuel in Model.FuelLogs.Take(10))
+                                {
+                                    <tr>
+                                        <td>@fuel.Date.ToString("dd MMM yyyy")</td>
+                                        <td>@fuel.Liters.ToString("N2") L</td>
+                                        <td>$@fuel.Cost.ToString("N2")</td>
+                                        <td>$@fuel.PricePerLiter.ToString("N2")</td>
+                                        <td>@fuel.Station</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-fuel-pump" style="font-size: 2rem;"></i>
+                        <p class="mt-2 mb-0">No fuel records</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
