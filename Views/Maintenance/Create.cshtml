@@ -1,1 +1,125 @@
+@model FleetFlow.Models.MaintenanceLog
+@{
+    ViewData["Title"] = "Add Maintenance Log";
+}
 
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-tools"></i> Add Maintenance Log
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Vehicle Selection -->
+                        <div class="col-md-6">
+                            <label asp-for="VehicleId" class="form-label">
+                                <i class="bi bi-truck"></i> Select Vehicle <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="VehicleId" class="form-select" asp-items="ViewBag.VehicleId">
+                                <option value="">-- Select Vehicle --</option>
+                            </select>
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Service Type -->
+                        <div class="col-md-6">
+                            <label asp-for="ServiceType" class="form-label">
+                                <i class="bi bi-wrench"></i> Service Type <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="ServiceType" class="form-select">
+                                <option value="">-- Select Service Type --</option>
+                                <option value="Oil Change">Oil Change</option>
+                                <option value="Tire Replacement">Tire Replacement</option>
+                                <option value="Brake Service">Brake Service</option>
+                                <option value="Engine Repair">Engine Repair</option>
+                                <option value="Battery Replacement">Battery Replacement</option>
+                                <option value="AC Service">AC Service</option>
+                                <option value="General Inspection">General Inspection</option>
+                                <option value="Transmission Service">Transmission Service</option>
+                                <option value="Suspension Repair">Suspension Repair</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="ServiceType" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label">
+                                <i class="bi bi-card-text"></i> Description
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                      placeholder="Detailed description of the service..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Service Date -->
+                        <div class="col-md-4">
+                            <label asp-for="ServiceDate" class="form-label">
+                                <i class="bi bi-calendar"></i> Service Date <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ServiceDate" type="date" class="form-control" />
+                            <span asp-validation-for="ServiceDate" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Cost -->
+                        <div class="col-md-4">
+                            <label asp-for="Cost" class="form-label">
+                                <i class="bi bi-currency-rupee"></i> Cost <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Cost" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="Cost" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Odometer -->
+                        <div class="col-md-4">
+                            <label asp-for="OdometerAtService" class="form-label">
+                                <i class="bi bi-speedometer"></i> Odometer Reading <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="OdometerAtService" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="OdometerAtService" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Performed By -->
+                        <div class="col-md-12">
+                            <label asp-for="PerformedBy" class="form-label">
+                                <i class="bi bi-building"></i> Workshop / Performed By
+                            </label>
+                            <input asp-for="PerformedBy" class="form-control" placeholder="Workshop name or mechanic" />
+                            <span asp-validation-for="PerformedBy" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Warning Box -->
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Important</h6>
+                        <p class="mb-0 small">
+                            Adding a maintenance log will automatically change the vehicle's status to <strong>"In Shop"</strong>.
+                            The vehicle will not be available for trip assignments until the maintenance is marked as complete.
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Add Maintenance Log
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
