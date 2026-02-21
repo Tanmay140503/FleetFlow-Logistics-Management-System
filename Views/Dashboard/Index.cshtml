@@ -1,1 +1,318 @@
+@model IEnumerable<FleetFlow.Models.Vehicle>
+@{
+    ViewData["Title"] = "Command Center";
+    var dashboard = ViewBag.DashboardData as FleetFlow.ViewModels.DashboardViewModel;
+}
 
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-speedometer2"></i> Command Center</h4>
+        <p class="text-muted mb-0">Real-time fleet overview and performance metrics</p>
+    </div>
+    <div>
+        <span class="badge bg-light text-dark">
+            <i class="bi bi-clock"></i> Last updated: @DateTime.Now.ToString("hh:mm tt")
+        </span>
+    </div>
+</div>
+
+<!-- KPI Cards Row 1 -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-truck text-success fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <p class="text-muted mb-1 small">Active Fleet</p>
+                        <h3 class="mb-0">@dashboard.ActiveFleet</h3>
+                        <small class="text-success">
+                            <i class="bi bi-arrow-up"></i> On Trip
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-tools text-warning fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <p class="text-muted mb-1 small">Maintenance Alerts</p>
+                        <h3 class="mb-0">@dashboard.MaintenanceAlerts</h3>
+                        <small class="text-warning">
+                            <i class="bi bi-exclamation-triangle"></i> In Shop
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-pie-chart text-primary fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <p class="text-muted mb-1 small">Utilization Rate</p>
+                        <h3 class="mb-0">@dashboard.UtilizationRate.ToString("0.0")%</h3>
+                        <div class="progress mt-2" style="height: 5px;">
+                            <div class="progress-bar bg-primary" style="width: @dashboard.UtilizationRate%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-box-seam text-info fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <p class="text-muted mb-1 small">Pending Cargo</p>
+                        <h3 class="mb-0">@dashboard.PendingCargo</h3>
+                        <small class="text-info">
+                            <i class="bi bi-clock"></i> Awaiting Dispatch
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards Row 2 -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100 border-start border-4 border-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Total Vehicles</p>
+                        <h4 class="mb-0">@dashboard.TotalVehicles</h4>
+                    </div>
+                    <i class="bi bi-bus-front text-primary fs-2 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100 border-start border-4 border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Total Drivers</p>
+                        <h4 class="mb-0">@dashboard.TotalDrivers</h4>
+                    </div>
+                    <i class="bi bi-people text-success fs-2 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100 border-start border-4 border-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Trips Today</p>
+                        <h4 class="mb-0">@dashboard.CompletedTripsToday</h4>
+                    </div>
+                    <i class="bi bi-check-circle text-warning fs-2 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card shadow-sm h-100 border-start border-4 border-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Today's Revenue</p>
+                        <h4 class="mb-0">₹@dashboard.TodayRevenue.ToString("N2")</h4>
+                    </div>
+                    <i class="bi bi-currency-rupee text-info fs-2 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Vehicle Type</label>
+                <select name="type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="0">🚛 Truck</option>
+                    <option value="1">🚐 Van</option>
+                    <option value="2">🏍️ Bike</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="0">✅ Available</option>
+                    <option value="1">🚗 On Trip</option>
+                    <option value="2">🔧 In Shop</option>
+                    <option value="3">❌ Out of Service</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Region</label>
+                <input type="text" name="region" class="form-control" placeholder="Search by region...">
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Fleet Status Table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Fleet Status</h5>
+            <a asp-controller="Vehicles" asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> Add Vehicle
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Vehicle</th>
+                        <th>Type</th>
+                        <th>License Plate</th>
+                        <th>Capacity</th>
+                        <th>Odometer</th>
+                        <th>Region</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var vehicle in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded p-2 me-2">
+                                            @switch (vehicle.Type)
+                                            {
+                                                case FleetFlow.Models.VehicleType.Truck:
+                                                    <i class="bi bi-truck text-primary"></i>
+                                                    break;
+                                                case FleetFlow.Models.VehicleType.Van:
+                                                    <i class="bi bi-bus-front text-info"></i>
+                                                    break;
+                                                case FleetFlow.Models.VehicleType.Bike:
+                                                    <i class="bi bi-bicycle text-success"></i>
+                                                    break;
+                                            }
+                                        </div>
+                                        <strong>@vehicle.Name</strong>
+                                    </div>
+                                </td>
+                                <td>@vehicle.Type</td>
+                                <td><code class="bg-light px-2 py-1 rounded">@vehicle.LicensePlate</code></td>
+                                <td>@vehicle.MaxLoadCapacity.ToString("N0") kg</td>
+                                <td>@vehicle.CurrentOdometer.ToString("N0") km</td>
+                                <td>@vehicle.Region</td>
+                                <td>
+                                    @switch (vehicle.Status)
+                                    {
+                                        case FleetFlow.Models.VehicleStatus.Available:
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Available
+                                            </span>
+                                            break;
+                                        case FleetFlow.Models.VehicleStatus.OnTrip:
+                                            <span class="badge bg-primary">
+                                                <i class="bi bi-geo-alt"></i> On Trip
+                                            </span>
+                                            break;
+                                        case FleetFlow.Models.VehicleStatus.InShop:
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-tools"></i> In Shop
+                                            </span>
+                                            break;
+                                        case FleetFlow.Models.VehicleStatus.OutOfService:
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> Out of Service
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-controller="Vehicles" asp-action="Details" asp-route-id="@vehicle.Id"
+                                           class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-controller="Trips" asp-action="Create" asp-route-vehicleId="@vehicle.Id"
+                                           class="btn btn-outline-success" title="Create Trip">
+                                            <i class="bi bi-plus"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3">No vehicles found</p>
+                                <a asp-controller="Vehicles" asp-action="Create" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Add First Vehicle
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
