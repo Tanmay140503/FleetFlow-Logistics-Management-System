@@ -1,6 +1,6 @@
-using System.Diagnostics;
-using FleetFlow.Models;
 using Microsoft.AspNetCore.Mvc;
+using FleetFlow.Models;
+using System.Diagnostics;
 
 namespace FleetFlow.Controllers
 {
@@ -15,6 +15,10 @@ namespace FleetFlow.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Dashboard");
+            }
             return View();
         }
 
