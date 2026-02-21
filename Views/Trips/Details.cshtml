@@ -1,1 +1,224 @@
+@model FleetFlow.Models.Trip
+@{
+    ViewData["Title"] = "Trip Details";
+}
 
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Trips</a></li>
+        <li class="breadcrumb-item active">@Model.TripCode</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Main Trip Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><code>@Model.TripCode</code></h5>
+                    @switch (Model.Status)
+                    {
+                        case FleetFlow.Models.TripStatus.Draft:
+                            <span class="badge bg-secondary fs-6">Draft</span>
+                            break;
+                        case FleetFlow.Models.TripStatus.Dispatched:
+                            <span class="badge bg-primary fs-6">Dispatched</span>
+                            break;
+                        case FleetFlow.Models.TripStatus.Completed:
+                            <span class="badge bg-success fs-6">Completed</span>
+                            break;
+                        case FleetFlow.Models.TripStatus.Cancelled:
+                            <span class="badge bg-danger fs-6">Cancelled</span>
+                            break;
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Route Map Placeholder -->
+                <div class="bg-light rounded p-4 mb-4 text-center">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="p-3 bg-white rounded shadow-sm">
+                                <i class="bi bi-geo-alt text-success fs-3"></i>
+                                <h6 class="mt-2 mb-1">Origin</h6>
+                                <p class="mb-0">@Model.OriginAddress</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-arrow-right text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="p-3 bg-white rounded shadow-sm">
+                                <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+                                <h6 class="mt-2 mb-1">Destination</h6>
+                                <p class="mb-0">@Model.DestinationAddress</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trip Details Grid -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Cargo Information</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td class="text-muted">Weight</td>
+                                <td class="text-end"><strong>@Model.CargoWeight kg</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Description</td>
+                                <td class="text-end">@(Model.CargoDescription ?? "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Revenue</td>
+                                <td class="text-end"><strong>@(Model.Revenue.HasValue ? "$" + Model.Revenue.Value.ToString("N2") : "N/A")</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Odometer</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td class="text-muted">Start</td>
+                                <td class="text-end">@Model.StartOdometer.ToString("N0") km</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">End</td>
+                                <td class="text-end">@(Model.EndOdometer.HasValue? Model.EndOdometer.Value.ToString("N0") + " km" : "N/A")</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Distance</td>
+                                <td class="text-end"><strong>@(Model.DistanceTraveled.HasValue? Model.DistanceTraveled.Value.ToString("N0") + " km" : "N/A")</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="alert alert-secondary mt-4">
+                        <h6 class="alert-heading"><i class="bi bi-journal-text"></i> Notes</h6>
+                        <p class="mb-0">@Model.Notes</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-secondary text-white rounded-circle p-2" style="width: 40px; height: 40px; text-align: center;">
+                                <i class="bi bi-file-earmark"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <strong>Trip Created</strong>
+                            <br><small class="text-muted">@Model.CreatedAt.ToString("dd MMM yyyy hh:mm tt")</small>
+                        </div>
+                    </div>
+                    @if (Model.DispatchedAt.HasValue)
+                    {
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary text-white rounded-circle p-2" style="width: 40px; height: 40px; text-align: center;">
+                                    <i class="bi bi-send"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <strong>Dispatched</strong>
+                                <br><small class="text-muted">@Model.DispatchedAt.Value.ToString("dd MMM yyyy hh:mm tt")</small>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.CompletedAt.HasValue)
+                    {
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success text-white rounded-circle p-2" style="width: 40px; height: 40px; text-align: center;">
+                                    <i class="bi bi-check"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <strong>Completed</strong>
+                                <br><small class="text-muted">@Model.CompletedAt.Value.ToString("dd MMM yyyy hh:mm tt")</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-4">
+        <!-- Vehicle Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-truck"></i> Vehicle</h6>
+            </div>
+            <div class="card-body text-center">
+                @switch (Model.Vehicle.Type)
+                {
+                    case FleetFlow.Models.VehicleType.Truck:
+                        <i class="bi bi-truck text-primary" style="font-size: 3rem;"></i>
+                        break;
+                    case FleetFlow.Models.VehicleType.Van:
+                        <i class="bi bi-bus-front text-info" style="font-size: 3rem;"></i>
+                        break;
+                    case FleetFlow.Models.VehicleType.Bike:
+                        <i class="bi bi-bicycle text-success" style="font-size: 3rem;"></i>
+                        break;
+                }
+                <h5 class="mt-2 mb-1">@Model.Vehicle.Name</h5>
+                <code>@Model.Vehicle.LicensePlate</code>
+                <p class="mt-2 mb-0 text-muted">Capacity: @Model.Vehicle.MaxLoadCapacity kg</p>
+            </div>
+        </div>
+
+        <!-- Driver Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-person"></i> Driver</h6>
+            </div>
+            <div class="card-body text-center">
+                <i class="bi bi-person-circle text-secondary" style="font-size: 3rem;"></i>
+                <h5 class="mt-2 mb-1">@Model.Driver.Name</h5>
+                <p class="mb-0 text-muted">@Model.Driver.Email</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-lightning"></i> Actions</h6>
+            </div>
+            <div class="card-body d-grid gap-2">
+                @if (Model.Status == FleetFlow.Models.TripStatus.Draft)
+                {
+                    <form asp-action="Dispatch" asp-route-id="@Model.Id" method="post">
+                        <button type="submit" class="btn btn-primary w-100" onclick="return confirm('Dispatch this trip?')">
+                            <i class="bi bi-send"></i> Dispatch Trip
+                        </button>
+                    </form>
+                }
+                @if (Model.Status == FleetFlow.Models.TripStatus.Dispatched)
+                {
+                    <a asp-action="Complete" asp-route-id="@Model.Id" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Complete Trip
+                    </a>
+                }
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
