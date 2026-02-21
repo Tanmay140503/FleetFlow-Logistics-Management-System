@@ -1,1 +1,173 @@
+@model IEnumerable<FleetFlow.Models.MaintenanceLog>
+@{
+    ViewData["Title"] = "Maintenance & Service Logs";
+    var showCompleted = ViewBag.ShowCompleted as bool? ?? false;
+}
 
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-tools"></i> Maintenance & Service Logs</h4>
+        <p class="text-muted mb-0">Preventative and reactive health tracking</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Maintenance Log
+    </a>
+</div>
+
+<!-- Filter Toggle -->
+<div class="mb-4">
+    <div class="btn-group">
+        <a asp-action="Index" class="btn @(showCompleted ? "btn-outline-primary" : "btn-primary")">
+            <i class="bi bi-clock"></i> Pending Only
+        </a>
+        <a asp-action="Index" asp-route-showCompleted="true" class="btn @(showCompleted ? "btn-primary" : "btn-outline-primary")">
+            <i class="bi bi-list-check"></i> Show All
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-start border-4 border-warning">
+            <div class="card-body">
+                <h6 class="text-muted">Pending</h6>
+                <h3>@Model.Count(m => !m.IsCompleted)</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-start border-4 border-success">
+            <div class="card-body">
+                <h6 class="text-muted">Completed</h6>
+                <h3>@Model.Count(m => m.IsCompleted)</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-start border-4 border-primary">
+            <div class="card-body">
+                <h6 class="text-muted">Total Cost</h6>
+                <h3>₹@Model.Sum(m => m.Cost).ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-start border-4 border-info">
+            <div class="card-body">
+                <h6 class="text-muted">This Month</h6>
+                <h3>₹@Model.Where(m => m.ServiceDate.Month == DateTime.Now.Month && m.ServiceDate.Year == DateTime.Now.Year).Sum(m => m.Cost).ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Maintenance Table -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Vehicle</th>
+                        <th>Service Type</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Cost</th>
+                        <th>Performed By</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var log in Model)
+                        {
+                            <tr class="@(log.IsCompleted ? "table-light" : "")">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-warning bg-opacity-10 rounded p-2 me-2">
+                                            <i class="bi bi-tools text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <strong>@log.Vehicle.Name</strong>
+                                            <br><small class="text-muted">@log.Vehicle.LicensePlate</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">@log.ServiceType</span>
+                                </td>
+                                <td>
+                                    <small>@(log.Description?.Length > 50 ? log.Description.Substring(0, 50) + "..." : log.Description ?? "-")</small>
+                                </td>
+                                <td>
+                                    @log.ServiceDate.ToString("dd MMM yyyy")
+                                    @if (log.CompletedDate.HasValue)
+                                    {
+                                        <br>
+                            
+                                        <small class="text-success">Completed: @log.CompletedDate.Value.ToString("dd MMM")</small>
+                                    }
+                                </td>
+                                <td><strong>$@log.Cost.ToString("N2")</strong></td>
+                                <td>@(log.PerformedBy ?? "-")</td>
+                                <td>
+                                    @if (log.IsCompleted)
+                                    {
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Completed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> In Progress</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@log.Id"
+                                           class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@log.Id"
+                                           class="btn btn-outline-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        @if (!log.IsCompleted)
+                                        {
+                                            <form asp-action="MarkComplete" asp-route-id="@log.Id" method="post" style="display:inline;">
+                                                <button type="submit" class="btn btn-outline-success" title="Mark Complete"
+                                                        onclick="return confirm('Mark this maintenance as complete?')">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this maintenance log?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="bi bi-tools text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3">No maintenance logs found</p>
+                                <a asp-action="Create" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Add First Maintenance Log
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
