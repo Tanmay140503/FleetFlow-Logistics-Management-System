@@ -1,0 +1,161 @@
+﻿@model FleetFlow.Models.FuelLog
+@{
+    ViewData["Title"] = "Edit Fuel Log";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil"></i> Edit Fuel Log
+                </h5>
+            </div>
+            <div class="card-body p-4">
+
+                @* Current Info Display *@
+                <div class="alert alert-info mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Vehicle</small>
+                            <strong>@Model.Vehicle?.Name</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Current Cost</small>
+                            <strong>$@Model.Cost.ToString("N2")</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Price/Liter</small>
+                            <strong>$@Model.PricePerLiter.ToString("N2")</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        @* Vehicle Selection *@
+                        <div class="col-md-6">
+                            <label asp-for="VehicleId" class="form-label">
+                                <i class="bi bi-truck"></i> Vehicle <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="VehicleId" class="form-select" asp-items="ViewBag.VehicleId">
+                                <option value="">-- Select Vehicle --</option>
+                            </select>
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
+                        </div>
+
+                        @* Trip (Optional) *@
+                        <div class="col-md-6">
+                            <label asp-for="TripId" class="form-label">
+                                <i class="bi bi-geo-alt"></i> Associated Trip (Optional)
+                            </label>
+                            <select asp-for="TripId" class="form-select" asp-items="ViewBag.TripId">
+                                <option value="">-- No Trip --</option>
+                            </select>
+                            <span asp-validation-for="TripId" class="text-danger small"></span>
+                        </div>
+
+                        @* Date *@
+                        <div class="col-md-4">
+                            <label asp-for="Date" class="form-label">
+                                <i class="bi bi-calendar"></i> Date <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Date" type="date" class="form-control" />
+                            <span asp-validation-for="Date" class="text-danger small"></span>
+                        </div>
+
+                        @* Liters *@
+                        <div class="col-md-4">
+                            <label asp-for="Liters" class="form-label">
+                                <i class="bi bi-droplet"></i> Liters <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Liters" type="number" class="form-control" step="0.01" min="0.01" id="litersInput" />
+                            <span asp-validation-for="Liters" class="text-danger small"></span>
+                        </div>
+
+                        @* Cost *@
+                        <div class="col-md-4">
+                            <label asp-for="Cost" class="form-label">
+                                <i class="bi bi-currency-dollar"></i> Total Cost <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Cost" type="number" class="form-control" step="0.01" min="0.01" id="costInput" />
+                            <span asp-validation-for="Cost" class="text-danger small"></span>
+                        </div>
+
+                        @* Price Per Liter Display *@
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="bi bi-calculator"></i> Price Per Liter
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control bg-light" id="pricePerLiter" readonly />
+                            </div>
+                            <small class="text-muted">Auto-calculated</small>
+                        </div>
+
+                        @* Odometer *@
+                        <div class="col-md-4">
+                            <label asp-for="OdometerReading" class="form-label">
+                                <i class="bi bi-speedometer"></i> Odometer Reading (km) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="OdometerReading" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="OdometerReading" class="text-danger small"></span>
+                        </div>
+
+                        @* Station *@
+                        <div class="col-md-4">
+                            <label asp-for="Station" class="form-label">
+                                <i class="bi bi-geo"></i> Fuel Station
+                            </label>
+                            <input asp-for="Station" class="form-control" placeholder="Station name or location" />
+                            <span asp-validation-for="Station" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning px-4">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Calculate price per liter automatically
+        function calculatePricePerLiter() {
+            var liters = parseFloat(document.getElementById('litersInput').value) || 0;
+            var cost = parseFloat(document.getElementById('costInput').value) || 0;
+
+            if (liters > 0) {
+                var pricePerLiter = cost / liters;
+                document.getElementById('pricePerLiter').value = pricePerLiter.toFixed(2);
+            } else {
+                document.getElementById('pricePerLiter').value = '0.00';
+            }
+        }
+
+        // Calculate on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculatePricePerLiter();
+        });
+
+        // Calculate when inputs change
+        document.getElementById('litersInput').addEventListener('input', calculatePricePerLiter);
+        document.getElementById('costInput').addEventListener('input', calculatePricePerLiter);
+    </script>
+}

@@ -1,0 +1,179 @@
+﻿@model IEnumerable<FleetFlow.Models.FuelLog>
+@{
+    ViewData["Title"] = "Fuel Logs";
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-fuel-pump"></i> Fuel & Expense Logging</h4>
+        <p class="text-muted mb-0">Track fuel consumption and costs</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Fuel Log
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Vehicle</label>
+                <select name="vehicleId" class="form-select" asp-items="ViewBag.VehicleId">
+                    <option value="">All Vehicles</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">From Date</label>
+                <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">To Date</label>
+                <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="opacity-75">Total Fuel</h6>
+                        <h3 class="mb-0">@(ViewBag.TotalLiters?.ToString("N2") ?? "0") L</h3>
+                    </div>
+                    <i class="bi bi-droplet fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="opacity-75">Total Cost</h6>
+                        <h3 class="mb-0">₹@(ViewBag.TotalCost?.ToString("N2") ?? "0")</h3>
+                    </div>
+                    <i class="bi bi-currency-rupee fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="opacity-75">Avg. Price/Liter</h6>
+                        @{
+                            var avgPrice = ViewBag.TotalLiters > 0 ? ViewBag.TotalCost / ViewBag.TotalLiters : 0;
+                        }
+                        <h3 class="mb-0">₹@avgPrice.ToString("N2")</h3>
+                    </div>
+                    <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fuel Logs Table -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Trip</th>
+                        <th>Liters</th>
+                        <th>Cost</th>
+                        <th>Price/L</th>
+                        <th>Odometer</th>
+                        <th>Station</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var log in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@log.Date.ToString("dd MMM yyyy")</strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-fuel-pump text-info me-2"></i>
+                                        <div>
+                                            <strong>@log.Vehicle.Name</strong>
+                                            <br><small class="text-muted">@log.Vehicle.LicensePlate</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (log.Trip != null)
+                                    {
+                                        <code>@log.Trip.TripCode</code>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td><strong>@log.Liters.ToString("N2") L</strong></td>
+                                <td><strong class="text-danger">₹@log.Cost.ToString("N2")</strong></td>
+                                <td>₹@log.PricePerLiter.ToString("N2")</td>
+                                <td>@log.OdometerReading.ToString("N0") km</td>
+                                <td>@(log.Station ?? "-")</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@log.Id"
+                                           class="btn btn-outline-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@log.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete"
+                                                    onclick="return confirm('Delete this fuel log?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center py-5">
+                                <i class="bi bi-fuel-pump text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3">No fuel logs found</p>
+                                <a asp-action="Create" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Add First Fuel Log
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

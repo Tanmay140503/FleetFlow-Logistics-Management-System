@@ -1,0 +1,211 @@
+﻿@model FleetFlow.Models.MaintenanceLog
+@{
+    ViewData["Title"] = "Edit Maintenance Log";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil"></i> Edit Maintenance Log
+                </h5>
+            </div>
+            <div class="card-body p-4">
+
+                <!-- Current Info Display -->
+                <div class="alert alert-info mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Vehicle</small>
+                            <strong>@Model.Vehicle?.Name</strong>
+                            <br><code>@Model.Vehicle?.LicensePlate</code>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Service Type</small>
+                            <strong>@Model.ServiceType</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Current Status</small>
+                            @if (Model.IsCompleted)
+                            {
+                                <span class="badge bg-success">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">In Progress</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Vehicle Selection -->
+                        <div class="col-md-6">
+                            <label asp-for="VehicleId" class="form-label">
+                                <i class="bi bi-truck"></i> Vehicle <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="VehicleId" class="form-select" asp-items="ViewBag.VehicleId">
+                                <option value="">-- Select Vehicle --</option>
+                            </select>
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Service Type -->
+                        <div class="col-md-6">
+                            <label asp-for="ServiceType" class="form-label">
+                                <i class="bi bi-wrench"></i> Service Type <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="ServiceType" class="form-select">
+                                <option value="">-- Select Service Type --</option>
+                                <option value="Oil Change" selected="@(Model.ServiceType == "Oil Change")">Oil Change</option>
+                                <option value="Tire Replacement" selected="@(Model.ServiceType == "Tire Replacement")">Tire Replacement</option>
+                                <option value="Brake Service" selected="@(Model.ServiceType == "Brake Service")">Brake Service</option>
+                                <option value="Engine Repair" selected="@(Model.ServiceType == "Engine Repair")">Engine Repair</option>
+                                <option value="Battery Replacement" selected="@(Model.ServiceType == "Battery Replacement")">Battery Replacement</option>
+                                <option value="AC Service" selected="@(Model.ServiceType == "AC Service")">AC Service</option>
+                                <option value="General Inspection" selected="@(Model.ServiceType == "General Inspection")">General Inspection</option>
+                                <option value="Transmission Service" selected="@(Model.ServiceType == "Transmission Service")">Transmission Service</option>
+                                <option value="Suspension Repair" selected="@(Model.ServiceType == "Suspension Repair")">Suspension Repair</option>
+                                <option value="Electrical Repair" selected="@(Model.ServiceType == "Electrical Repair")">Electrical Repair</option>
+                                <option value="Body Work" selected="@(Model.ServiceType == "Body Work")">Body Work</option>
+                                <option value="Other" selected="@(Model.ServiceType == "Other")">Other</option>
+                            </select>
+                            <span asp-validation-for="ServiceType" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label">
+                                <i class="bi bi-card-text"></i> Description
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                      placeholder="Detailed description of the service..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Service Date -->
+                        <div class="col-md-4">
+                            <label asp-for="ServiceDate" class="form-label">
+                                <i class="bi bi-calendar"></i> Service Date <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="ServiceDate" type="date" class="form-control" />
+                            <span asp-validation-for="ServiceDate" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Cost -->
+                        <div class="col-md-4">
+                            <label asp-for="Cost" class="form-label">
+                                <i class="bi bi-currency-dollar"></i> Cost <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Cost" type="number" class="form-control" step="0.01" min="0" />
+                            </div>
+                            <span asp-validation-for="Cost" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Odometer -->
+                        <div class="col-md-4">
+                            <label asp-for="OdometerAtService" class="form-label">
+                                <i class="bi bi-speedometer"></i> Odometer (km) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="OdometerAtService" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="OdometerAtService" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Performed By -->
+                        <div class="col-md-6">
+                            <label asp-for="PerformedBy" class="form-label">
+                                <i class="bi bi-building"></i> Workshop / Performed By
+                            </label>
+                            <input asp-for="PerformedBy" class="form-control" placeholder="Workshop name or mechanic" />
+                            <span asp-validation-for="PerformedBy" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Is Completed -->
+                        <div class="col-md-6">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <div class="form-check form-switch mt-2">
+                                <input asp-for="IsCompleted" class="form-check-input" id="isCompletedSwitch" />
+                                <label asp-for="IsCompleted" class="form-check-label" for="isCompletedSwitch">
+                                    <strong>Mark as Completed</strong>
+                                </label>
+                            </div>
+                            <small class="text-muted">
+                                @if (Model.CompletedDate.HasValue)
+                                {
+                                    <text>Completed on: @Model.CompletedDate.Value.ToString("dd MMM yyyy hh:mm tt")</text>
+                                }
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Warning Box -->
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Important Notes</h6>
+                        <ul class="mb-0 small">
+                            <li>If marked as <strong>Completed</strong>, vehicle status will be checked for other pending maintenance.</li>
+                            <li>If <strong>Reopened</strong> (unchecked), vehicle will be set back to "In Shop".</li>
+                            <li>Vehicle status will only change to "Available" if no other pending maintenance exists.</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <div>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary me-2">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                            <button type="submit" class="btn btn-warning px-4">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Handle service type - if "Other" show text input
+        document.addEventListener('DOMContentLoaded', function() {
+            var serviceTypeSelect = document.getElementById('ServiceType');
+            var currentValue = '@Model.ServiceType';
+
+            // Check if current value matches any option
+            var options = serviceTypeSelect.options;
+            var found = false;
+
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].value === currentValue) {
+                    options[i].selected = true;
+                    found = true;
+                    break;
+                }
+            }
+
+            // If not found, select "Other"
+            if (!found && currentValue) {
+                for (var i = 0; i < options.length; i++) {
+                    if (options[i].value === 'Other') {
+                        options[i].selected = true;
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,105 @@
+﻿@model FleetFlow.Models.FuelLog
+@{
+    ViewData["Title"] = "Add Fuel Log";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-fuel-pump"></i> Add Fuel Log
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Vehicle Selection -->
+                        <div class="col-md-6">
+                            <label asp-for="VehicleId" class="form-label">
+                                <i class="bi bi-truck"></i> Select Vehicle <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="VehicleId" class="form-select" asp-items="ViewBag.VehicleId">
+                                <option value="">-- Select Vehicle --</option>
+                            </select>
+                            <span asp-validation-for="VehicleId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Trip (Optional) -->
+                        <div class="col-md-6">
+                            <label asp-for="TripId" class="form-label">
+                                <i class="bi bi-geo-alt"></i> Associated Trip (Optional)
+                            </label>
+                            <select asp-for="TripId" class="form-select" asp-items="ViewBag.TripId">
+                                <option value="">-- No Trip --</option>
+                            </select>
+                            <span asp-validation-for="TripId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="col-md-4">
+                            <label asp-for="Date" class="form-label">
+                                <i class="bi bi-calendar"></i> Date <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Date" type="date" class="form-control" />
+                            <span asp-validation-for="Date" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Liters -->
+                        <div class="col-md-4">
+                            <label asp-for="Liters" class="form-label">
+                                <i class="bi bi-droplet"></i> Liters <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Liters" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="Liters" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Cost -->
+                        <div class="col-md-4">
+                            <label asp-for="Cost" class="form-label">
+                                <i class="bi bi-currency-rupee"></i> Total Cost <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Cost" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="Cost" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Odometer -->
+                        <div class="col-md-6">
+                            <label asp-for="OdometerReading" class="form-label">
+                                <i class="bi bi-speedometer"></i> Odometer Reading <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="OdometerReading" type="number" class="form-control" step="0.01" min="0" />
+                            <span asp-validation-for="OdometerReading" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Station -->
+                        <div class="col-md-6">
+                            <label asp-for="Station" class="form-label">
+                                <i class="bi bi-geo"></i> Fuel Station
+                            </label>
+                            <input asp-for="Station" class="form-control" placeholder="Station name or location" />
+                            <span asp-validation-for="Station" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Add Fuel Log
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
