@@ -1,1 +1,262 @@
+@model FleetFlow.Models.Driver
+@{
+    ViewData["Title"] = "Driver Details";
+    var completionRate = ViewBag.CompletionRate as decimal? ?? 0;
+    var totalDistance = ViewBag.TotalDistance as decimal? ?? 0;
+}
 
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Drivers</a></li>
+        <li class="breadcrumb-item active">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- Driver Profile Card -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="bi bi-person-circle text-secondary" style="font-size: 5rem;"></i>
+                </div>
+                <h4 class="mb-1">@Model.Name</h4>
+                <p class="text-muted mb-3">@Model.Email</p>
+
+                @switch (Model.Status)
+                {
+                    case FleetFlow.Models.DriverStatus.OnDuty:
+                        <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> On Duty</span>
+                        break;
+                    case FleetFlow.Models.DriverStatus.OffDuty:
+                        <span class="badge bg-secondary fs-6"><i class="bi bi-moon"></i> Off Duty</span>
+                        break;
+                    case FleetFlow.Models.DriverStatus.Suspended:
+                        <span class="badge bg-danger fs-6"><i class="bi bi-slash-circle"></i> Suspended</span>
+                        break;
+                }
+
+                <hr class="my-4">
+
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted text-start">Phone</td>
+                        <td class="text-end"><strong>@(Model.PhoneNumber ?? "N/A")</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted text-start">License</td>
+                        <td class="text-end"><code>@Model.LicenseNumber</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted text-start">Category</td>
+                        <td class="text-end"><strong>@Model.LicenseCategory</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted text-start">License Expiry</td>
+                        <td class="text-end">
+                            @if (Model.LicenseExpiry <= DateTime.Now)
+                            {
+                                <span class="badge bg-danger">Expired</span>
+                            }
+                            else if (Model.LicenseExpiry <= DateTime.Now.AddDays(30))
+                            {
+                                <span class="badge bg-warning text-dark">Expiring Soon</span>
+                            }
+                            else
+                            {
+                                <span class="text-success">@Model.LicenseExpiry.ToString("dd MMM yyyy")</span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted text-start">Hire Date</td>
+                        <td class="text-end"><strong>@Model.HireDate.ToString("dd MMM yyyy")</strong></td>
+                    </tr>
+                </table>
+
+                <hr class="my-4">
+
+                <div class="d-grid gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Edit Profile
+                    </a>
+                    @if (Model.Status == FleetFlow.Models.DriverStatus.Suspended)
+                    {
+                        <form asp-action="Reactivate" asp-route-id="@Model.Id" method="post">
+                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Reactivate this driver?')">
+                                <i class="bi bi-arrow-clockwise"></i> Reactivate Driver
+                            </button>
+                        </form>
+                    }
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety Score Card -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-shield-check"></i> Safety Score</h6>
+            </div>
+            <div class="card-body text-center">
+                @{
+                    var scoreColor = Model.SafetyScore >= 80 ? "success" :
+                    Model.SafetyScore >= 60 ? "warning" : "danger";
+                }
+                <div class="position-relative d-inline-block">
+                    <svg width="150" height="150" viewBox="0 0 150 150">
+                        <circle cx="75" cy="75" r="60" stroke="#e9ecef" stroke-width="12" fill="none" />
+                        <circle cx="75" cy="75" r="60" stroke="var(--bs-@scoreColor)" stroke-width="12" fill="none"
+                                stroke-dasharray="@(377 * Model.SafetyScore / 100) 377"
+                                transform="rotate(-90 75 75)" stroke-linecap="round" />
+                    </svg>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <h2 class="mb-0 text-@scoreColor">@Model.SafetyScore.ToString("0")</h2>
+                        <small class="text-muted">/ 100</small>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    @if (Model.SafetyScore >= 80)
+                    {
+                        <span class="badge bg-success fs-6">Excellent</span>
+                    }
+                    else if (Model.SafetyScore >= 60)
+                    {
+                        <span class="badge bg-warning text-dark fs-6">Good</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger fs-6">Needs Improvement</span>
+                    }
+                </div>
+
+                <!-- Update Safety Score -->
+                <hr>
+                <form asp-action="UpdateSafetyScore" asp-route-id="@Model.Id" method="post">
+                    <div class="input-group input-group-sm">
+                        <input type="number" name="newScore" class="form-control" min="0" max="100" step="0.01"
+                               placeholder="New Score" required />
+                        <button type="submit" class="btn btn-outline-primary" onclick="return confirm('Update safety score?')">
+                            Update
+                        </button>
+                    </div>
+                    <input type="hidden" name="reason" value="Manual Update" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-8">
+        <!-- Performance Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h6 class="opacity-75">Total Trips</h6>
+                        <h3 class="mb-0">@Model.TotalTripsCompleted</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h6 class="opacity-75">Completion Rate</h6>
+                        <h3 class="mb-0">@completionRate.ToString("0.0")%</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="opacity-75">Total Distance</h6>
+                        <h3 class="mb-0">@totalDistance.ToString("N0") km</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trip History -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Trip History</h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Trips != null && Model.Trips.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Trip Code</th>
+                                    <th>Vehicle</th>
+                                    <th>Route</th>
+                                    <th>Date</th>
+                                    <th>Distance</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var trip in Model.Trips.Take(20))
+                                {
+                                    <tr>
+                                        <td><code>@trip.TripCode</code></td>
+                                        <td>
+                                            <i class="bi bi-truck text-primary me-1"></i>
+                                            @trip.Vehicle?.Name
+                                        </td>
+                                        <td>
+                                            <small>
+                                                @trip.OriginAddress<br>
+                                                <i class="bi bi-arrow-down text-muted"></i><br>
+                                                @trip.DestinationAddress
+                                            </small>
+                                        </td>
+                                        <td>@trip.CreatedAt.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            @if (trip.DistanceTraveled.HasValue)
+                                            {
+                                                <span>@trip.DistanceTraveled.Value.ToString("N0") km</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @switch (trip.Status)
+                                            {
+                                                case FleetFlow.Models.TripStatus.Draft:
+                                                    <span class="badge bg-secondary">Draft</span>
+                                                    break;
+                                                case FleetFlow.Models.TripStatus.Dispatched:
+                                                    <span class="badge bg-primary">Dispatched</span>
+                                                    break;
+                                                case FleetFlow.Models.TripStatus.Completed:
+                                                    <span class="badge bg-success">Completed</span>
+                                                    break;
+                                                case FleetFlow.Models.TripStatus.Cancelled:
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                    break;
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-geo-alt" style="font-size: 3rem;"></i>
+                        <p class="mt-2 mb-0">No trips recorded yet</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
