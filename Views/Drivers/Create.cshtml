@@ -1,1 +1,111 @@
+@model FleetFlow.Models.Driver
+@{
+    ViewData["Title"] = "Add New Driver";
+}
 
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus"></i> Add New Driver
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-4">
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label">
+                                <i class="bi bi-person"></i> Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter driver's full name" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">
+                                <i class="bi bi-envelope"></i> Email Address <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="driver@example.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="bi bi-telephone"></i> Phone Number
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <!-- License Number -->
+                        <div class="col-md-6">
+                            <label asp-for="LicenseNumber" class="form-label">
+                                <i class="bi bi-card-text"></i> License Number <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="LicenseNumber" class="form-control" placeholder="DL-XXXXXXX" style="text-transform: uppercase;" />
+                            <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                        </div>
+
+                        <!-- License Expiry -->
+                        <div class="col-md-6">
+                            <label asp-for="LicenseExpiry" class="form-label">
+                                <i class="bi bi-calendar"></i> License Expiry Date <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="LicenseExpiry" type="date" class="form-control" />
+                            <span asp-validation-for="LicenseExpiry" class="text-danger small"></span>
+                        </div>
+
+                        <!-- License Category -->
+                        <div class="col-md-6">
+                            <label asp-for="LicenseCategory" class="form-label">
+                                <i class="bi bi-tags"></i> License Category <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="LicenseCategory" class="form-select">
+                                <option value="">-- Select Category --</option>
+                                <option value="Bike">Bike Only</option>
+                                <option value="Van">Van Only</option>
+                                <option value="Truck">Truck Only</option>
+                                <option value="Van, Truck">Van & Truck</option>
+                                <option value="Bike, Van">Bike & Van</option>
+                                <option value="Bike, Van, Truck">All Categories</option>
+                            </select>
+                            <span asp-validation-for="LicenseCategory" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Info Box -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Driver Registration</h6>
+                        <ul class="mb-0 small">
+                            <li>Driver will be added with <strong>Off Duty</strong> status</li>
+                            <li>Initial Safety Score: <strong>100</strong></li>
+                            <li>Driver can only be assigned to trips matching their license category</li>
+                            <li>Expired license will block trip assignments</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle"></i> Add Driver
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
